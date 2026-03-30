@@ -68,13 +68,43 @@ class SimplexSolver:
             self.status = "No leaving variable, problem is unbounded"
             return -1
         else:
-            leaving_variable_index: int = positive_leaving_indices[ratio_arr[ratio_arr > 0].argmin()]  # we can easily divide matrices in this manner, we return the smallest value that isn't
+            leaving_variable_index: int = int( positive_leaving_indices[ratio_arr[ratio_arr > 0].argmin()] )  # we can easily divide matrices in this manner, we return the smallest value that isn't negative
             self.status = "Leaving variable index is "+str(leaving_variable_index)
             return leaving_variable_index
 
-    def _build_new_B_inv (self) -> np.ndarray:
-        """build eta and E and returns E*B_inv for new B_inv"""
-        pass
+    def _build_new_B_inv (self, entering_col: list[float], leaving_var_index: int) -> np.ndarray:
+        """build eta and E and returns E*B_inv for new B_inv (S*) """
+        eta: np.ndarray = np.zeros(self._num_constraints, dtype=float)
+        for i in range(len(entering_col)):
+            if i == leaving_var_index:
+                eta[i] = 1/entering_col[leaving_var_index]
+            else:
+                eta[i] = -1*(entering_col[i])/entering_col[leaving_var_index]
+
+        E: np.ndarray = np.eye(self._num_constraints, dtype=float) #create an identity matrix in the shape of our constaints
+        E[:, leaving_var_index] = eta #[select all rows, select the column that aligns with the row that is leaving] = eta vector
+
+        S_star = E @ self.B_inv
+
+        return S_star #returns S*
+
+
     def solve(self) -> tuple[np.ndarray, str]:
         """solves simplex problem, returns the final z* row and value"""
+
+        #construct simplex problem from inputs
+        # for test: Max Z= 3*x1 + x2
+        # s.j.      x1 + x2 <= 4
+        #           x1      <= 2
+        #                x2 <= 8
+        # assumes non-negativity
+
+        A = [1, 2,
+             1,
+               1,  ]
+        b = [4, 2, 8]
+        c = [3, 1]
+
+        simplexProblem = SimplexSolver(c, A, b, maximize=True)
+
         pass
