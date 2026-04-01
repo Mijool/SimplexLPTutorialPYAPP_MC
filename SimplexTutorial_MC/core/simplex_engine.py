@@ -55,56 +55,133 @@ class SimplexSolver:
         else: #otherwise, all variables are positive and the solution is optimal
             self.status = "Optimal solution found"
             return -1
-    def _minimum_ratio_test(self, entering_col: list[float]) -> int:
-        """calculate A* = S* @ A and b* = S* @ b to find our leaving variable, return -1 if unbounded (all are negative or undefined)"""
-        A_star: np.ndarray = (self.B_inv @ self._A)[:, entering_col] # slices matrix to only get the column we need for our min. ratio test, ':' selects all rows, and we only want the entering variables column
+    def _minimum_ratio_test(self, A_star: np.ndarray, b_star: np.ndarray) -> int:
+        """calculate A* = S* @ A and b* = S* @ b to find row index of our leaving variable, return -1 if unbounded (all are negative or undefined)"""
 
-        b_star: np.ndarray = self.B_inv @ self._b
+        #we have to use a tiny number instead of zero to eliminate problems with floating-point errors
+        # wrong: positive_leaving_indices = np.argwhere( ratio_arr > 0).flatten()
+        valid_rows = np.argwhere(A_star > 1e-9).flatten()
 
-        ratio_arr = (b_star / A_star)
-        positive_leaving_indices = np.argwhere( ratio_arr > 0).flatten()
+        # These get calculated outside and entered in here
+        # A_star: np.ndarray = (self.B_inv @ self._A), entering_col] # slices matrix to only get the column we need for our min. ratio test, ':' selects all rows, and we only want the entering variables column
+        #
+        # b_star: np.ndarray = self.B_inv @ self._b
 
-        if positive_leaving_indices.size == 0:
-            self.status = "No leaving variable, problem is unbounded"
+        if valid_rows.size == 0:
+            self.status = "No leaving variable, problem is considered unbounded"
             return -1
-        else:
-            leaving_variable_index: int = int( positive_leaving_indices[ratio_arr[ratio_arr > 0].argmin()] )  # we can easily divide matrices in this manner, we return the smallest value that isn't negative
-            self.status = "Leaving variable index is "+str(leaving_variable_index)
-            return leaving_variable_index
 
-    def _build_new_B_inv (self, entering_col: list[float], leaving_var_index: int) -> np.ndarray:
+        #we get the ratios of only our positive rows
+        ratio_arr = b_star[valid_rows] / A_star[valid_rows]
+
+        min_valid_value = int(np.min(ratio_arr))
+
+        #store the index where the leaving variable is located
+        leaving_variable_index: int = int(valid_rows[min_valid_value])
+
+        #leaving_variable_index: int = int( valid_rows[ratio_arr[ratio_arr > 0].argmin()] )  # we can easily divide matrices in this manner, we return the smallest value that isn't negative
+        self.status = "Leaving variable index is "+str(leaving_variable_index)
+        return leaving_variable_index
+
+    def _build_new_B_inv (self, A_star: np.ndarray, leaving_row_index: int) -> np.ndarray:
         """build eta and E and returns E*B_inv for new B_inv (S*) """
+        #previously was using the entering column and not the entire new matrix
+
         eta: np.ndarray = np.zeros(self._num_constraints, dtype=float)
-        for i in range(len(entering_col)):
-            if i == leaving_var_index:
-                eta[i] = 1/entering_col[leaving_var_index]
+        for i in range(len(A_star)):
+            if i == leaving_row_index:
+                eta[i] = 1.0/A_star[leaving_row_index]
             else:
-                eta[i] = -1*(entering_col[i])/entering_col[leaving_var_index]
+                eta[i] = -1(A_star[i])/A_star[leaving_row_index]
 
         E: np.ndarray = np.eye(self._num_constraints, dtype=float) #create an identity matrix in the shape of our constaints
-        E[:, leaving_var_index] = eta #[select all rows, select the column that aligns with the row that is leaving] = eta vector
+        E[:, leaving_row_index] = eta #[select all rows, select the column that aligns with the row that is leaving] = eta vector
 
         S_star = E @ self.B_inv
 
         return S_star #returns S*
 
+    def solve(self) -> tuple[np.ndarray, float, str]:
+        """
+        Executes the Revised Simplex loop until optimality or unboundedness is reached.
+        Returns (final_solution_values, max_Z_value, status_message)
+        """
+        max_iterations = 100  # Failsafe to prevent infinite loops
+        iteration = 0
 
-    def solve(self) -> tuple[np.ndarray, str]:
-        """solves simplex problem, returns the final z* row and value"""
+        while iteration < max_iterations:
+            # Step 1: Calculate Simplex Multipliers (y*)
+            y_star = self._find_y_star()
 
-        #construct simplex problem from inputs
-        # for test: Max Z= 3*x1 + x2
-        # s.j.      x1 + x2 <= 4
-        #           x1      <= 2
-        #                x2 <= 8
-        # assumes non-negativity
+            # Step 2: Pricing (Find entering variable)
+            entering_idx = self._find_entering_variable_index(y_star)
 
-        A = [1, 2,
-             1,
-               1,  ]
-        b = [4, 2, 8]
-        c = [3, 1]
+            # If -1 is returned, all reduced costs are positive. We are optimal!
+            if entering_idx == -1:
+                break
 
-        simplexProblem = SimplexSolver(c, A, b, maximize=True)
+            # Step 3: Calculate entering column in current basis (A*) and current RHS (b*)
+            A_star = self.B_inv @ self._A[:, entering_idx]
+            b_star = self.B_inv @ self._b
 
-        pass
+            # Step 4: Minimum Ratio Test (Find leaving row)
+            # (Note: I updated your _minimum_ratio_test below to accept A_star and b_star directly)
+            leaving_row = self._minimum_ratio_test(A_star, b_star)
+
+            if leaving_row == -1:
+                break  # Status is set to unbounded in the helper method
+
+            # Step 5: Update the Basis Inverse (B_inv) using the Eta matrix logic
+            self.B_inv = self._build_new_B_inv(A_star, leaving_row)
+
+            # Step 6: Update our tracking variables for the new basis
+            self.basic_indices[leaving_row] = entering_idx
+            self.cB[leaving_row] = self._c[entering_idx]
+
+            iteration += 1
+
+        # Calculate final answers to return
+        final_b_star = self.B_inv @ self._b
+        final_z = float(self.cB @ final_b_star)
+
+        return final_b_star, final_z, self.status
+
+
+
+"""Section for testing engine in the console with a defined problem"""
+
+
+def test_simplex():
+    """
+    Tests the SimplexSolver with a predefined 2D LP problem:
+    Max Z = 3x1 + x2
+    s.t.
+      x1 +  x2 <= 4
+      x1 + 0x2 <= 2
+     0x1 +  x2 <= 8
+    """
+
+    # Notice the 2D array structure here
+    A = [
+        [1.0, 1.0],
+        [1.0, 0.0],
+        [0.0, 1.0]
+    ]
+    b = [4.0, 2.0, 8.0]
+    c = [3.0, 1.0]
+
+    print("--- Starting Simplex Solver Test ---")
+    solver = SimplexSolver(obj_coefficients=c, constraint_matrix=A, rhs_values=b, maximize=True)
+
+    final_b_star, max_z, final_status = solver.solve()
+
+    print(f"Final Status: {final_status}")
+    print(f"Optimal Z Value: {max_z}")
+    print("Basic Variables in solution:")
+    for row_idx, var_idx in enumerate(solver.basic_indices):
+        print(f"  x{var_idx} = {final_b_star[row_idx]}")
+
+
+# Run the test if this file is executed directly
+if __name__ == "__main__":
+    test_simplex()
