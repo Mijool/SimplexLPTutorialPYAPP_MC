@@ -5,10 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="38709fc7-dfab-4b5b-97da-c038e6967411" name="Changes" comment="a">
-      <change beforePath="$PROJECT_DIR$/.idea/Simplex.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Simplex.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SimplexTutorial_MC/core/simplex_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/SimplexTutorial_MC/core/simplex_engine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SimplexTutorial_MC/libraryRequirements.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SimplexTutorial_MC/main_consoleTest.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SimplexTutorial_MC/main_tkinterGUI.py" beforeDir="false" afterPath="$PROJECT_DIR$/SimplexTutorial_MC/main_tkinterGUI.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SimplexTutorial_MC/test/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SimplexTutorial_MC/test/simplexTester.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,7 +30,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/Mijool/SimplexLPTutorialPYAPP_MC.git&quot;,
-    &quot;accountId&quot;: &quot;3ee71bfb-355d-4b8c-91a2-6c41dc570046&quot;
+    &quot;accountId&quot;: &quot;2e1e4312-4c1a-450e-8491-e6df908a9d04&quot;
   }
 }</component>
   <component name="ProjectColorInfo">{
@@ -40,16 +43,18 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Python.main_tkinterGUI.executor": "Run",
+    "Python.simplex_engine.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main",
-    "settings.editor.selected.configurable": "editor.preferences.completion"
+    "settings.editor.selected.configurable": "preferences.pluginManager"
   }
 }]]></component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-164cda30dcd9-0af03a5fa574-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.26830.99" />
+        <option value="bundled-python-sdk-4e2b1448bda8-9a97661f3031-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.27397.106" />
       </set>
     </attachedChunks>
   </component>
