@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="38709fc7-dfab-4b5b-97da-c038e6967411" name="Changes" comment="a">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SimplexTutorial_MC/core/simplex_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/SimplexTutorial_MC/core/simplex_engine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SimplexTutorial_MC/libraryRequirements.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SimplexTutorial_MC/main_consoleTest.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SimplexTutorial_MC/main_tkinterGUI.py" beforeDir="false" afterPath="$PROJECT_DIR$/SimplexTutorial_MC/main_tkinterGUI.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SimplexTutorial_MC/test/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SimplexTutorial_MC/test/simplexTester.py" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Mijool&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Mijool/SimplexLPTutorialPYAPP_MC.git&quot;,
+    &quot;accountId&quot;: &quot;2e1e4312-4c1a-450e-8491-e6df908a9d04&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="3Ad8giJukaIjUsfj8a6LG0pNvpu" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.main_tkinterGUI.executor": "Run",
+    "Python.simplex_engine.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-4e2b1448bda8-9a97661f3031-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.27397.106" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="38709fc7-dfab-4b5b-97da-c038e6967411" name="Changes" comment="" />
+      <created>1772911200809</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1772911200809</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="a" />
+    <option name="LAST_COMMIT_MESSAGE" value="a" />
+  </component>
+</project>
