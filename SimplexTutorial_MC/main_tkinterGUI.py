@@ -1,9 +1,17 @@
-from ctypes import windll
+#from ctypes import windll
+import platform
 import tkinter as tk
 import time as dt
 from tkinter import ttk, messagebox
 
 import numpy as np
+
+#AI bugfix for gui bug on mac
+import matplotlib
+matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
 import matplotlib.pyplot as plt
 
 from core.simplex_engine import SimplexSolver
@@ -14,6 +22,11 @@ class SimplexGUIMain:
         self.root = root
         self.root.title("2D & 3D Simplex LP Solver by Miguel Camarena")
         self.root.geometry("800x600")
+        self.style = ttk.Style()
+        self.style.theme_use('clam')  # Consistent cross-platform rendering
+
+        self.root.grid_rowconfigure(0, weight=1)
+        self.root.grid_columnconfigure(0, weight=1)
 
         # we want to lay out the same variables from our simplex solver's constructor
         # calculation settings
@@ -43,6 +56,14 @@ class SimplexGUIMain:
         self._build_results_panel()
 
 
+        #mac specific render fix
+        if platform.system() == "Darwin":
+            self.root.update()
+            # Micro-resize forces Cocoa to render subviews without manual resizing
+            self.root.after(50, lambda: self.root.geometry("801x600"))
+            self.root.after(100, lambda: self.root.geometry("800x600"))
+
+
     # UI CONSTRUCTION METHODS
 
     def _build_settings(self) -> None:
@@ -57,7 +78,7 @@ class SimplexGUIMain:
         self._maximize =     ttk.Checkbutton(self.settings_frame, text="Maximize", variable=self.maximize)
         self._maximize.pack(side="left", padx=25, pady=5)
 
-        self._generate_grid = ttk.Button(self.settings_frame, text="Generate grid", command=self._build_input_grid)
+        self._generate_grid = ttk.Button(self.settings_frame, text="Refresh inputs", command=self._build_input_grid)
         self._generate_grid.pack(side="left", padx=25, pady=5,ipadx=5)
 
         (ttk.Label(self.settings_frame, text="Set # of Constraints:")
@@ -65,7 +86,6 @@ class SimplexGUIMain:
 
         self._set_constraints = ttk.Spinbox(self.settings_frame, textvariable=self.num_constraints)
         self._set_constraints.pack(side="left", padx=10, pady=5,ipadx=5)
-
 
     def _build_input_grid(self) -> None:
         """Clears the current input frame and dynamically generates text boxes."""
@@ -82,62 +102,80 @@ class SimplexGUIMain:
         vars_count = self.num_decision_variables.get()
         cons_count = self.num_constraints.get()
 
+        # --- NEW: Define default test values ---
+        default_c = [3.0, 1.0]
+        default_A = [
+            [1.0, 1.0],
+            [1.0, 0.0],
+            [0.0, 1.0]
+        ]
+        default_b = [4.0, 2.0, 8.0]
+
+        # Only inject if the grid dimensions match the default example
+        use_defaults = (vars_count == len(default_c) and cons_count == len(default_b))
+
         widthSize = 5
 
-        #text that says Z =
+        # text that says Z =
         (ttk.Label(self.input_frame, text="Z =", font=("Arial", 10, "bold"))
-            .grid(row=0, column=0, padx=(10, 2), pady=5,sticky="e"))
+         .grid(row=0, column=0, padx=(10, 2), pady=5, sticky="e"))
 
         cur_col = 1
         # Use a standard 'for' loop to create the Objective Function (c) tk.Entry boxes
         for j in range(vars_count):
-            # 1. Create the Entry Box
             entry = ttk.Entry(self.input_frame, width=widthSize)
             entry.grid(row=0, column=cur_col, padx=2, pady=5)
+
+            # --- NEW: Insert default c value ---
+            if use_defaults:
+                entry.insert(0, str(default_c[j]))
+
             self.obj_func_entries.append(entry)
             cur_col += 1
 
-            # 2. Create the trailing Label (e.g., "x1 +" or just "x2")
+            # 2. Create the trailing Label
             if j < vars_count - 1:
                 label_text = f"x{j + 1} +"
             else:
-                label_text = f"x{j + 1}"  # The last variable doesn't have a '+' after it
+                label_text = f"x{j + 1}"
 
             ttk.Label(self.input_frame, text=label_text).grid(row=0, column=cur_col, padx=2, pady=5, sticky="w")
             cur_col += 1
 
-
-        # nested for loops (rows = cons_count, cols = vars_count) to create
-        # the Constraint Matrix (A) tk.Entry boxes, and the RHS (b) tk.Entry boxes.
-
-         #increase constraint count and align A and b under the c row
+        # Nested for loops to create the Constraint Matrix (A) and the RHS (b)
         for i in range(cons_count):
             row_entries = []
-
             cur_col = 1
-            # we create a list of entry boxes and pack them into a grid
+
             for j in range(vars_count):
-                # 1. Create the Entry Box (Notice how .grid() is on a separate line to prevent the NoneType bug!)
                 entry = ttk.Entry(self.input_frame, width=widthSize)
                 entry.grid(row=i + 1, column=cur_col, padx=2, pady=2)
+
+                # --- NEW: Insert default A value ---
+                if use_defaults:
+                    entry.insert(0, str(default_A[i][j]))
+
                 row_entries.append(entry)
                 cur_col += 1
 
-                # 2. Create the trailing Label (e.g., "x1 +" or "x2 <=")
                 if j < vars_count - 1:
                     label_text = f"x{j + 1} +"
                 else:
-                    label_text = f"x{j + 1} <="  # The last variable gets the inequality symbol
+                    label_text = f"x{j + 1} <="
 
                 (ttk.Label(self.input_frame, text=label_text)
-                 .grid(row=i + 1, column=cur_col, padx=2, pady=2,sticky="w"))
+                 .grid(row=i + 1, column=cur_col, padx=2, pady=2, sticky="w"))
                 cur_col += 1
 
-            #pack b column after creating the A matrix for tab order continuity
+            # Pack b column after creating the A matrix for tab order continuity
             b_entry = ttk.Entry(self.input_frame, width=widthSize)
             b_entry.grid(row=i + 1, column=cur_col, padx=2, pady=2)
-            self.rhs_entries.append(b_entry)
 
+            # --- NEW: Insert default b value ---
+            if use_defaults:
+                b_entry.insert(0, str(default_b[i]))
+
+            self.rhs_entries.append(b_entry)
             self.constraint_entries.append(row_entries)
 
     def _build_results_panel(self) -> None:
@@ -224,8 +262,10 @@ class SimplexGUIMain:
 
 # --- Application Startup ---
 if __name__ == "__main__":
-    windll.shcore.SetProcessDpiAwareness(1)
+
 
     app_window = tk.Tk()
+
     app = SimplexGUIMain(app_window)
+
     app_window.mainloop()
